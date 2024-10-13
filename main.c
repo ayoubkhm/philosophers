@@ -97,6 +97,11 @@ int	main(int argc, char **argv)
 	t_data			data;
 	t_philos		*philosophers;
 
+	if (argc != 5 && argc != 6)
+	{
+		printf("Error: Incorrect number of arguments\n");
+		return (1);
+	}
 	if (initialize_all(&data, &philosophers, argc, argv) != 0)
 		return (1);
 	if (start_philosopher_threads(&data, philosophers) != 0)
