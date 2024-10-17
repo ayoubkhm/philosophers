@@ -65,6 +65,11 @@ int	init_fork_mutexes(t_data *data)
 
 int	init_global_mutexes(t_data *data)
 {
+	if (pthread_mutex_init(&data->someone_died_mutex, NULL) != 0)
+	{
+		printf("Error: Mutex initialization failed\n");
+		return (1);
+	}
 	if (pthread_mutex_init(&data->meal_mutex, NULL) != 0)
 	{
 		printf("Error: Mutex initialization failed\n");

@@ -33,16 +33,27 @@ void	ft_usleep(long time_in_ms)
 
 void	print_status(t_philos *philo, char *message)
 {
-	pthread_mutex_lock(&philo->data->print_mutex);
-	if (!philo->data->someone_died)
-	{
-		printf("%ld %d %s\n",
-			get_current_time() - philo->data->start_time,
-			philo->id,
-			message);
-	}
-	pthread_mutex_unlock(&philo->data->print_mutex);
+
+    // Protection avec le mutex pour someone_died
+	pthread_mutex_lock(&philo->data->meal_mutex);
+    pthread_mutex_lock(&philo->data->someone_died_mutex);
+    if (!philo->data->someone_died)
+    {
+        pthread_mutex_unlock(&philo->data->someone_died_mutex);
+    	pthread_mutex_lock(&philo->data->print_mutex);
+        printf("%ld %d %s\n", get_current_time() - philo->data->start_time, philo->id, message);
+    	pthread_mutex_unlock(&philo->data->print_mutex);
+    }
+    else
+    {
+        pthread_mutex_unlock(&philo->data->someone_died_mutex);
+    }
+		pthread_mutex_unlock(&philo->data->meal_mutex);
+
+    
 }
+
+
 
 void	free_resources(t_data *data, t_philos *philosophers)
 {
