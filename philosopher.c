@@ -58,23 +58,35 @@ void	handle_single_philosopher(t_philos *philo)
 	philo->data->someone_died = 1;
 }
 
-void	philosopher_life_cycle(t_philos *philo)
+void philosopher_life_cycle(t_philos *philo)
 {
-	while (!philo->data->someone_died && !philo->data->all_satisfied)
-	{
-		eat(philo);
-		pthread_mutex_lock(&philo->data->meal_mutex);
-		if (philo->data->must_eat_count != -1
-			&& philo->meals_eaten >= philo->data->must_eat_count)
-		{
-			philo->done = 1;
-			pthread_mutex_unlock(&philo->data->meal_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&philo->data->meal_mutex);
-		rest_and_think(philo);
-	}
+    t_data *data = philo->data;
+
+    while (1)
+    {
+        pthread_mutex_lock(&data->someone_died_mutex);
+        if (data->someone_died || data->all_satisfied)
+        {
+            pthread_mutex_unlock(&data->someone_died_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&data->someone_died_mutex);
+
+        eat(philo);
+
+        pthread_mutex_lock(&data->meal_mutex);
+        if (data->must_eat_count != -1 &&
+            philo->meals_eaten >= data->must_eat_count)
+        {
+            philo->done = 1;
+            pthread_mutex_unlock(&data->meal_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&data->meal_mutex);
+        rest_and_think(philo);
+    }
 }
+
 
 void	*philosopher_routine(void *arg)
 {

@@ -14,29 +14,36 @@
 
 int	check_philosopher_state(t_philos *philo)
 {
-	t_data	*data;
-	int		result;
+    t_data	*data;
+    int		result;
 
-	data = philo->data;
-	result = 0;
-	pthread_mutex_lock(&data->meal_mutex);
-	if (philo->done)
-	{
-		pthread_mutex_unlock(&data->meal_mutex);
-		return (0);
-	}
-	if ((get_current_time() - philo->last_meal_time) > data->t_to_die)
-	{
-		data->someone_died = 1;
-		pthread_mutex_lock(&data->print_mutex);
-		printf("%ld %d died\n", get_current_time()
-			- data->start_time, philo->id);
-		pthread_mutex_unlock(&data->print_mutex);
-		result = 1;
-	}
-	pthread_mutex_unlock(&data->meal_mutex);
-	return (result);
+    data = philo->data;
+    result = 0;
+
+    pthread_mutex_lock(&data->meal_mutex);
+    if (philo->done)
+    {
+        pthread_mutex_unlock(&data->meal_mutex);
+        return (0);
+    }
+    
+    if ((get_current_time() - philo->last_meal_time) > data->t_to_die)
+    {
+        pthread_mutex_lock(&data->someone_died_mutex);
+        data->someone_died = 1;
+
+        pthread_mutex_lock(&data->print_mutex);
+        printf("%ld %d died\n", get_current_time() - data->start_time, philo->id);
+        pthread_mutex_unlock(&data->print_mutex);
+        pthread_mutex_unlock(&data->someone_died_mutex);
+
+        result = 1;
+    }
+    pthread_mutex_unlock(&data->meal_mutex);
+    return (result);
 }
+
+
 
 int	check_all_philosophers(t_philos *philosophers)
 {
