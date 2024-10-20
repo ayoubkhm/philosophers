@@ -27,7 +27,7 @@ typedef struct s_data {
 	int				must_eat_count;
 	int				someone_died;
 	long			start_time;
-    pthread_mutex_t someone_died_mutex;
+	pthread_mutex_t	someone_died_mutex;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_mutex;
 	int				all_satisfied;

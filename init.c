@@ -19,7 +19,7 @@ int	init_data_values(t_data *data, int argc, char **argv)
 	data->t_to_eat = ft_atol(argv[3]);
 	data->t_to_sleep = ft_atol(argv[4]);
 	if (argc == 6)
-		data->must_eat_count = atoi(argv[5]);
+		data->must_eat_count = ft_atoi(argv[5]);
 	else
 		data->must_eat_count = -1;
 	data->someone_died = 0;
