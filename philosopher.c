@@ -46,6 +46,8 @@ void	rest_and_think(t_philos *philo)
 	print_status(philo, "is sleeping");
 	ft_usleep(philo->data->t_to_sleep);
 	print_status(philo, "is thinking");
+	if (philo->data->nb_philosophers % 2)
+		usleep(philo->data->t_to_eat * 0.9 * 1000);
 }
 
 void	handle_single_philosopher(t_philos *philo)
@@ -58,35 +60,33 @@ void	handle_single_philosopher(t_philos *philo)
 	philo->data->someone_died = 1;
 }
 
-void philosopher_life_cycle(t_philos *philo)
+void	philosopher_life_cycle(t_philos *philo)
 {
-    t_data *data = philo->data;
+	t_data	*data;
 
-    while (1)
-    {
-        pthread_mutex_lock(&data->someone_died_mutex);
-        if (data->someone_died || data->all_satisfied)
-        {
-            pthread_mutex_unlock(&data->someone_died_mutex);
-            break;
-        }
-        pthread_mutex_unlock(&data->someone_died_mutex);
-
-        eat(philo);
-
-        pthread_mutex_lock(&data->meal_mutex);
-        if (data->must_eat_count != -1 &&
-            philo->meals_eaten >= data->must_eat_count)
-        {
-            philo->done = 1;
-            pthread_mutex_unlock(&data->meal_mutex);
-            break;
-        }
-        pthread_mutex_unlock(&data->meal_mutex);
-        rest_and_think(philo);
-    }
+	data = philo->data;
+	while (1)
+	{
+		pthread_mutex_lock(&data->someone_died_mutex);
+		if (data->someone_died || data->all_satisfied)
+		{
+			pthread_mutex_unlock(&data->someone_died_mutex);
+			break ;
+		}
+		pthread_mutex_unlock(&data->someone_died_mutex);
+		eat(philo);
+		pthread_mutex_lock(&data->meal_mutex);
+		if (data->must_eat_count != -1
+			&& philo->meals_eaten >= data->must_eat_count)
+		{
+			philo->done = 1;
+			pthread_mutex_unlock(&data->meal_mutex);
+			break ;
+		}
+		pthread_mutex_unlock(&data->meal_mutex);
+		rest_and_think(philo);
+	}
 }
-
 
 void	*philosopher_routine(void *arg)
 {
