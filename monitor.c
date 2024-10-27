@@ -64,6 +64,7 @@ int	check_all_philosophers(t_philos *philosophers)
 	if (data->must_eat_count != -1 && finished_eating)
 	{
 		data->all_satisfied = 1;
+		printf("Number of meals requested has been achieved.\n");
 		return (2);
 	}
 	return (0);

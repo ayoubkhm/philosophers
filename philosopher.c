@@ -68,7 +68,7 @@ void	philosopher_life_cycle(t_philos *philo)
 	while (1)
 	{
 		pthread_mutex_lock(&data->someone_died_mutex);
-		if (data->someone_died || data->all_satisfied)
+		if (data->stop_threads || data->someone_died || data->all_satisfied)
 		{
 			pthread_mutex_unlock(&data->someone_died_mutex);
 			break ;
@@ -93,6 +93,13 @@ void	*philosopher_routine(void *arg)
 	t_philos	*philo;
 
 	philo = (t_philos *)arg;
+	pthread_mutex_lock(&philo->data->someone_died_mutex);
+	if (philo->data->stop_threads)
+	{
+		pthread_mutex_unlock(&philo->data->someone_died_mutex);
+		return (NULL);
+	}
+	pthread_mutex_unlock(&philo->data->someone_died_mutex);
 	if (philo->data->nb_philosophers == 1)
 	{
 		handle_single_philosopher(philo);

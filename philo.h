@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
+# include <limits.h> 
 
 typedef struct s_data {
 	int				nb_philosophers;
@@ -32,6 +33,7 @@ typedef struct s_data {
 	pthread_mutex_t	print_mutex;
 	int				all_satisfied;
 	pthread_mutex_t	meal_mutex;
+	int				stop_threads;
 }	t_data;
 
 typedef struct s_philo {
@@ -53,7 +55,8 @@ int		init_global_mutexes(t_data *data);
 int		init_philosophers(t_philos **philosophers, t_data *data);
 int		initialize_all(t_data *data, t_philos **philos, int argc, char **argv);
 int		start_philosopher_threads(t_data *data, t_philos *philosophers);
-void	handle_thread_creation_error(t_philos *philosophers, int count);
+void	handle_thread_creation_error(t_data *data,
+			t_philos *philosophers, int count);
 int		manage_monitor_and_wait(t_data *data, t_philos *philosophers);
 int		main(int argc, char **argv);
 int		check_philosopher_state(t_philos *philo);
