@@ -53,40 +53,45 @@ int	start_philosopher_threads(t_data *data, t_philos *philosophers)
 	return (0);
 }
 
-void	handle_thread_creation_error(t_philos *philosophers, int count)
+void	handle_thread_creation_error(t_data *data, t_philos *philos, int count)
 {
 	int	j;
 
+	pthread_mutex_lock(&data->someone_died_mutex);
+	data->stop_threads = 1;
+	pthread_mutex_unlock(&data->someone_died_mutex);
 	j = 0;
 	while (j < count)
 	{
-		pthread_cancel(philosophers[j].thread_id);
+		pthread_join(philos[j].thread_id, NULL);
 		j++;
 	}
 }
 
-int	manage_monitor_and_wait(t_data *data, t_philos *philosophers)
+int	manage_monitor_and_wait(t_data *data, t_philos *philo)
 {
-	pthread_t	monitor_thread;
+	pthread_t	mon_thread;
 	int			i;
 
-	if (pthread_create(&monitor_thread, NULL,
-			monitor_routine, (void *)philosophers) != 0)
+	if (pthread_create(&mon_thread, NULL, monitor_routine, (void *)philo) != 0)
 	{
 		printf("Error: Monitor thread creation failed\n");
+		pthread_mutex_lock(&data->someone_died_mutex);
+		data->stop_threads = 1;
+		pthread_mutex_unlock(&data->someone_died_mutex);
 		i = 0;
 		while (i < data->nb_philosophers)
 		{
-			pthread_cancel(philosophers[i].thread_id);
+			pthread_join(philo[i].thread_id, NULL);
 			i++;
 		}
 		return (1);
 	}
-	pthread_join(monitor_thread, NULL);
+	pthread_join(mon_thread, NULL);
 	i = 0;
 	while (i < data->nb_philosophers)
 	{
-		pthread_join(philosophers[i].thread_id, NULL);
+		pthread_join(philo[i].thread_id, NULL);
 		i++;
 	}
 	return (0);

@@ -12,6 +12,30 @@
 
 #include "philo.h"
 
+int	validate_arguments(t_data *data, int argc)
+{
+	if (data->t_to_die < 1 || data->t_to_eat < 1 || data->t_to_sleep < 1)
+	{
+		printf("Error: Time values must be at least 1 ms.\n");
+		return (1);
+	}
+	if (data->nb_philosophers > 250 || data->nb_philosophers <= 0)
+	{
+		printf("Error: Number of philosophers must be between 1 and 250\n");
+		return (1);
+	}
+	if (data->t_to_die > INT_MAX
+		|| data->t_to_eat > INT_MAX
+		|| data->t_to_sleep > INT_MAX
+		|| (argc == 6 && (data->must_eat_count <= 0
+				|| data->must_eat_count > INT_MAX)))
+	{
+		printf("Error: Args must be positive nb and not exceed INT_MAX\n");
+		return (1);
+	}
+	return (0);
+}
+
 int	init_data_values(t_data *data, int argc, char **argv)
 {
 	data->nb_philosophers = ft_atoi(argv[1]);
@@ -24,17 +48,10 @@ int	init_data_values(t_data *data, int argc, char **argv)
 		data->must_eat_count = -1;
 	data->someone_died = 0;
 	data->start_time = 0;
+	data->stop_threads = 0;
 	data->all_satisfied = 0;
-	if (data->t_to_die < 1 || data->t_to_eat < 1 || data->t_to_sleep < 1)
+	if (validate_arguments(data, argc) != 0)
 	{
-		printf("Error: Time values must be at least 1 ms.\n");
-		return (1);
-	}
-	if (data->nb_philosophers <= 0 || data->t_to_die < 0
-		|| data->t_to_eat < 0 || data->t_to_sleep < 0
-		|| (argc == 6 && data->must_eat_count <= 0))
-	{
-		printf("Error: Invalid arguments\n");
 		return (1);
 	}
 	return (0);

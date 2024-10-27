@@ -3,7 +3,7 @@
 NAME = philo
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread
 
 SRCS = main.c init.c philosopher.c utils.c monitor.c parsing.c destroy.c
 OBJS = $(SRCS:.c=.o)
